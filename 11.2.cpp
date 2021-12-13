@@ -1,76 +1,159 @@
-﻿#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <iomanip>
+﻿#include<iostream>
+#include<locale.h>
+#include<stdlib.h>
+#include < string.h > 
+#include<Windows.h>
+#include<wchar.h>
+void show(int mode, int i);
 using namespace std;
-
-int main()
+class Book
 {
-    ofstream word("spisok.txt");
-    ifstream ford("spisok.txt");
-    setlocale(0, "Russian");
-    int a;
-    string xx, zz, yy, dd, ff;
-    string line;
-    char fia[300], pol[300], voz[300], mes[300], diagn[300], f[300], n[300], q[500];
-    int ui = 0;
-    do {
-        cout << "\t\t__________________________________________________________________________\n";
-        cout << "\t\t1. добавить запись \n";
-        cout << "\t\t2. вывести на экран данные массива \n";
-        cout << "\t\t3. вывести на экран результат выполнения массива\n";
-        cout << "\t\t4. End \n";
-        cout << "\t\t__________________________________________________________________________\n";
-        cin >> a;
-        switch (a) {
-        case 1:
-            cout << "ФИО клиента: "; // ввод данных происходит через нижнее подчеркивание.
-            cin >> fia;
-            cout << "Пол: ";
-            cin >> pol;
-            cout << "Возраст пациента: ";
-            cin >> voz;
-            cout << "Место жительства: ";
-            cin >> mes;
-            cout << "Диагноз: ";
-            cin >> diagn;
-            word << fia << ' ' << pol << ' ' << voz << ' ' << mes << ' ' << diagn;
-            word << endl;
-            break;
-        case 2:
-            cout << "ФИО клиента" << setw(20) << "Пол" << setw(20) << "Возраст пациента" << setw(20) << "Место жительства" << setw(20) << "Диагноз";
-            cout << endl;
-            while (!ford.eof())
-            {
-                ford >> fia >> pol >> voz >> mes >> diagn;
-                cout << fia << setw(20) << pol << setw(20) << voz << setw(20) << mes << setw(20) << diagn << endl;
-            }
-            break;
+private:
+	char author[100];
+	char title[100];
+	char publishing[100];
+	int year;
+	int count_of_page;
+public:
 
-        case 3:
+	int sravi(int y)
+	{
+		if (year >= y) return 0;
+		else return 1;
+	}
+	int srpb(char s[])
+	{
+		if (strcmp(s, publishing) == 0) return 0;
+		else return 1;
+	}
+	int srav(char s[])
+	{
+		if (strcmp(s, author) == 0) return 0;
+		else return 1;
+	}
+	void get(void)
+	{
+		cout << "Автор : " << author << endl;
 
-            while (getline(ford, line))
-            {
-                istringstream aaa(line);
-                aaa >> xx >> zz >> yy >> dd >> ff;
+		cout << "Название книги : " << title << endl;
+		cout << "Издательство : " << publishing << endl;
+		cout << "Год : " << year << endl;
+		cout << "Количество страниц : " << count_of_page << endl;
+	}
+	void set(void)
+	{
+		cout << "Введите имя автора книги : " << endl;
+		cin.get();
+		cin.getline(author, 100);
+		cout << "Введите название книги : " << endl;
+		cin.getline(title, 100);
+		cout << "Введите назавние издательства : " << endl;
+		cin.getline(publishing, 100);
+		cout << "Введите год издания книги : " << endl;
+		cin >> year;
+		cout << "Введите количество страниц : " << endl;
+		cin >> count_of_page;
+	}
+	friend int alphabit(Book& a, Book& b);
+};
+class Book* library;
 
-                if ("Moscow" != xx)
-                {
-                    cout << "  " << xx;
+int alphabit(Book& a, Book& b)
+{
+	return strcmp(a.author, b.author);
+}
 
+int main(void)
+{
+	int ans, i = 0;
+	setlocale(LC_ALL, "Russian");
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+	do
+	{
+		cout << "Есть еще книги? (1)-да, (2)-нет,любая другая кнопка-выход из программы" << endl;
+		cin >> ans;
+		if (ans == 1)
+		{
+			library = (class Book*)realloc(library, (i + 1) * sizeof(class Book));
+			library[i].set();
+			i++;
+		}
+		else if (ans == 2)
+		{
+			for (int k = 0; k < i; k++)
+			{
+				for (int j = 0; j < i - k; j++)
+				{
+					if (alphabit(library[j + 1], library[j]) < 0)
+					{
+						Book buf = library[j];
+						library[j] = library[j + 1];
+						library[j + 1] = buf;
 
-                }
-
-            }
-            break;
-        case 4:
-            word.close();
-            ford.close();
-            exit(0);
-            break;
-        }
-    } while (true);
-    return 0;
-    system("pause");
+					}
+				}
+			}
+			printf("!!!");
+			for (int k = 0; k < i; k++)
+			{
+				library[k].get();
+			}
+			int ans;
+			cout << "Выберите мод для вывода" << endl << "(1) - список книг данного автора" << endl;
+			cout << "(2) - список книг от данного издательства" << endl << "(3) - список книг написанных после данного года" << endl;
+			cout << "(4) - выход из программы" << endl;
+			cin >> ans;
+			if (ans >= 1 && ans <= 3)show(ans, i);
+			else { cout << "Выход из программы" << endl; return 0; }
+		}
+		else break;
+	} while (1);
+	free(library);
+	delete library;
+	return 0;
+}
+void show(int mode, int i)
+{
+	switch (mode)
+	{
+	case(1):
+	{
+		char name[100];
+		cout << "Введите имя писателя, которого хотите найти" << endl;
+		cin.get();
+		cin.getline(name, 100);
+		for (int k = 0; k < i; k++)
+		{
+			if (library[k].srav(name) == 0)
+				library[k].get();
+		}
+		break;
+	}
+	case(2):
+	{
+		char name[100];
+		cout << "Введите название издательства, которого хотите найти" << endl;
+		cin.get();
+		cin.getline(name, 100);
+		for (int k = 0; k < i; k++)
+		{
+			if (library[k].srpb(name) == 0)
+				library[k].get();
+		}
+		break;
+	}
+	case(3):
+	{
+		int a_year;
+		cout << "Введите искомый год" << endl;
+		cin >> a_year;
+		for (int k = 0; k < i; k++)
+		{
+			if (library[k].sravi(a_year) == 0)
+				library[k].get();
+		}
+		break;
+	}
+	}
 }
