@@ -20,7 +20,7 @@ int main()
     cout << "Результат А увелечения на 3 : " << a << endl;
     cout << "Результат B увелечения на 3: " << b << endl;
     swap(a, b);
-    cout << "aw: " << a << endl;
-    cout << "b: " << b << endl;
+    cout << "a=b: " << a << endl;
+    cout << "b=a: " << b << endl;
     return 0;
 }
